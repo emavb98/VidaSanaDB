@@ -1,0 +1,51 @@
+CREATE TABLE Turnos (
+
+	id_turno INT IDENTITY (1,1) PRIMARY KEY,
+	id_medico INT,
+	id_paciente INT,
+	fecha_turno DATE,
+	hora TIME,
+	motivo NVARCHAR (200),
+	FOREIGN KEY (id_medico) REFERENCES Medicos(id_medico),
+	FOREIGN KEY (id_paciente) REFERENCES Pacientes (id_paciente)
+);
+
+INSERT INTO Turnos (id_medico, id_paciente, fecha_turno, hora, motivo) VALUES
+-- Turnos del día actual
+(1, 1, CAST(GETDATE() AS DATE), '09:00', 'Control de presión arterial'),
+(2, 3, CAST(GETDATE() AS DATE), '10:30', 'Revisión pediátrica'),
+(1, 2, CAST(GETDATE() AS DATE), '11:00', 'Chequeo general'),
+(3, 4, CAST(GETDATE() AS DATE), '12:00', 'Evaluación dermatológica'),
+(4, 5, CAST(GETDATE() AS DATE), '13:30', 'Consulta ginecológica'),
+(5, 6, CAST(GETDATE() AS DATE), '15:00', 'Revisión neurológica'),
+(6, 7, CAST(GETDATE() AS DATE), '16:30', 'Chequeo oftalmológico'),
+
+-- Turnos para mañana
+(1, 8, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '09:30', 'Control de presión arterial'),
+(2, 5, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '10:00', 'Consulta pediátrica'),
+(3, 1, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '11:30', 'Evaluación dermatológica'),
+(4, 3, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '12:00', 'Consulta ginecológica'),
+(5, 2, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '14:00', 'Consulta neurológica'),
+(6, 4, DATEADD(DAY,1,CAST(GETDATE() AS DATE)), '15:30', 'Revisión oftalmológica'),
+
+-- Turnos para pasado mañana
+(1, 6, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '08:30', 'Chequeo general'),
+(2, 7, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '10:00', 'Consulta pediátrica'),
+(3, 8, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '11:00', 'Evaluación dermatológica'),
+(4, 1, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '13:00', 'Consulta ginecológica'),
+(5, 3, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '14:30', 'Consulta neurológica'),
+(6, 2, DATEADD(DAY,2,CAST(GETDATE() AS DATE)), '15:30', 'Revisión oftalmológica');
+
+-- Consultar turnos del día actual
+SELECT 
+    T.id_turno,
+    M.nombre AS Medico,
+    P.nombre AS Paciente,
+    T.fecha_turno,
+    CONVERT(VARCHAR(5), T.hora, 108) AS Hora,
+    T.motivo
+FROM Turnos T
+JOIN Medicos M ON T.id_medico = M.id_medico
+JOIN Pacientes P ON T.id_paciente = P.id_paciente
+WHERE T.fecha_turno = CAST(GETDATE() AS DATE)
+ORDER BY T.hora;
